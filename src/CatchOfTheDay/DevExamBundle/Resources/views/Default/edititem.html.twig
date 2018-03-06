@@ -1,0 +1,13 @@
+{% if item != "" %}
+{% for itm in item %}
+<form class="form-horizontal">
+    <div class="form-group">
+        <div class="col-md-12">
+            <input type="text" class="form-control" id="todo-item-text-input" name="todo-item-text" placeholder="Text" value="{{itm.getText()}}" />
+            <input type="hidden" id="to-do-item-id" name="to-do-item-id" value="{{itm.getId()}}" />
+        </div>
+    </div>
+</form>
+{% endfor %}
+{% endif %}
+                   

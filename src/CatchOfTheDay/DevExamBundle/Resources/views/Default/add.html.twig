@@ -1,0 +1,23 @@
+{% if type == 'complete' %}
+    {% set completed = false %}
+    {%set text = "Mark as Complete"%}
+{% else %}
+    {% set completed = true %}
+    {% set text = "Mark as Incomplete"%}
+{% endif %}
+{% for item in items %}
+    {% if item.complete == completed %}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.created|date('d/m/Y g:i a') }}</td>
+        <td>{{ item.text }}</td>
+        <td>
+            <a href="javascript:void(0);" data-href="{{path('edit_to_do_item',{'itemId':item.id})}}" data-title ="Edit Item" class="editItem btn btn-sm btn-primary">Edit Item</a>
+            <a href="javascript:void(0);" onClick="markAsComplete('{{ path('mark_as_complete', { 'itemId': item.id,'type':type }) }}','{{type}}')" class="btn btn-sm btn-success">
+                {{text}}
+            </a>
+        </td>
+    </tr>
+    {% endif %}
+{% endfor %}
+                   

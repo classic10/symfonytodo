@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}CatchOfTheDay Developer Exam{% endblock %}</title>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('bundles/catchofthedaydevexam/css/lib/bootstrap/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('bundles/catchofthedaydevexam/css/lib/bootstrap/bootstrap-theme.min.css') }}" />
+    {% endblock stylesheets %}
+</head>
+<body>
+{% block body %}{% endblock body %}
+{% block javascripts %}
+    <script src="{{ asset('bundles/catchofthedaydevexam/js/lib/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('bundles/catchofthedaydevexam/js/lib/bootstrap/bootstrap.min.js') }}"></script>
+    <script type="text/javascript">
+     $(document).ready(function(){
+        $("#successMsg").hide();
+        $("#failureMsg").hide();
+        /* To Open Model box for the edit item */
+         $('.editItem').on('click',function(){  
+            var dataURL = $(this).attr('data-href');
+            var dataTitle = $(this).attr('data-title');
+            $('.edit-body').load(dataURL,function(){
+            $('#editItem').modal({show:true});
+            $('.modal-title').html(dataTitle);
+            });
+        });
+    });
+   
+  /*
+   *markAsComplete - Common Javacript function to handle the Mark as complete and Incomplete
+   *@param completeUrl string
+   *@param type string
+   */
+    function markAsComplete(completeUrl,type){
+        if(type=="complete"){
+            var confirmComplete = confirm("Are you sure you want to mark complete for this item ?");
+        }else{
+            var confirmComplete = confirm("Are you sure you want to mark incomplete for this item ?");
+        }
+        if(confirmComplete){
+         $.ajax({
+                url:completeUrl,
+                type: "POST",
+                dataType: "json",
+                async: true,
+                success: function (data)
+                {
+                    if(data.status==1){
+                        $("#successMsg").show();
+                        $("#successMsg").html(data.message);
+                        $("#failureMsg").hide();
+                        $("#todoitems").html(data.newItems);
+                        $("#todo-text-input").val("");
+                    }else if(data.status==0){
+                        $("#successMsg").hide();
+                        $("#failureMsg").html(data.message);
+                        $("#failureMsg").show();
+                    }
+
+                }
+            });
+        }
+    }
+
+  /*
+   *updateItem - Common Javacript function to handle the Edit item at both the listings
+   *@param type string
+   */
+    function updateItem(type){
+        var error = 0 ;
+        var todoItemName = $.trim($("#todo-item-text-input").val());
+        var todoItemId = $("#to-do-item-id").val();
+        if(todoItemName==""){
+            alert("Please enter new text for the item to update. ");
+            error = 1;
+        }
+        if(todoItemId==""){
+            alert("Something went wrong. Please try again later. ");
+            error = 1;
+        }
+        if(error==0){
+            $.ajax({
+                url:"{{ (path('updateitem')) }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "todoItemName": todoItemName,"todoItemId":todoItemId,"type":type
+                },
+                async: true,
+                success: function (data)
+                {
+                    if(data.status==1){
+                        $("#successMsg").show();
+                        $("#successMsg").html(data.message);
+                        $("#failureMsg").hide();
+                        $("#todoitems").html(data.newItems);
+                        $("#todo-item-text-input").val("");
+                        $("#to-do-item-id").val("");
+                        $("#editItem .close").click()
+                    }else if(data.status==0){
+                        $("#successMsg").hide();
+                        $("#failureMsg").html(data.message);
+                        $("#failureMsg").show();
+                        $("#editItem .close").click()
+                    }
+
+                }
+            });
+        }
+    }
+    </script>
+{% endblock javascripts %}
+</body>
+</html>
